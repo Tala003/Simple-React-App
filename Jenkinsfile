@@ -34,13 +34,22 @@ pipeline {
             }
         }
 
-        stage('Archive Artifacts') {
+         stage('Archive Artifacts') {
             steps {
                 // Archive the build artifacts
                 archiveArtifacts artifacts: 'build/**', fingerprint: true
             }
         }
-    }
+
+        stage('Deploy to Vercel') {
+            steps {
+                // Deploy the React application to Vercel
+                sh "vercel --token $VERCEL_TOKEN --prod"
+            }
+        }
+            }
+        }
+    
 
     post {
         always {
@@ -48,4 +57,3 @@ pipeline {
             cleanWs()
         }
     }
-}

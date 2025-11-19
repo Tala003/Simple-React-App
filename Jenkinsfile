@@ -31,7 +31,6 @@ pipeline {
             steps {
                 sh """
                 npx vercel --token $VERCEL_TOKEN --prod --confirm \
-                --name $VERCEL_PROJECT_NAME --org $VERCEL_ORG_ID
                 """
             }
         }
@@ -46,3 +45,4 @@ pipeline {
         }
     }
 }
+

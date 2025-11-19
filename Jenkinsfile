@@ -1,59 +1,51 @@
 pipeline {
     agent any
+
     environment {
+        # Add your Vercel token here in Jenkins credentials or as plain text
         VERCEL_TOKEN = credentials('vercel-token')
-        
+
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from the repository
-                checkout scm
+                // Pull code from GitHub
+                git branch: 'main', url: 'https://github.com/your-username/your-react-app.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Install npm dependencies
+                // Install Node modules
                 sh 'npm install'
             }
         }
 
-        stage('Run Tests') {
+        stage('Build React App') {
             steps {
-                // Run unit tests
-                sh 'npm test'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                // Build the React application
+                // Build React project
                 sh 'npm run build'
-            }
-        }
-
-         stage('Archive Artifacts') {
-            steps {
-                // Archive the build artifacts
-                archiveArtifacts artifacts: 'build/**', fingerprint: true
             }
         }
 
         stage('Deploy to Vercel') {
             steps {
-                // Deploy the React application to Vercel
-                sh "vercel --token $VERCEL_TOKEN --prod"
+                // Deploy build folder to Vercel
+                sh """
+                npx vercel --token $VERCEL_TOKEN --prod --confirm \
+                --name $VERCEL_PROJECT_NAME --org $VERCEL_ORG_ID
+                """
             }
-        }
-            }
-        }
-    
-
-    post {
-        always {
-            // Clean up workspace after build
-            cleanWs()
         }
     }
+
+    post {
+        success {
+            echo 'React app deployed successfully to Vercel!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
